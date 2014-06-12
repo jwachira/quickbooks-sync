@@ -1,0 +1,14 @@
+source :gemcutter
+
+gem "builder"
+gem "nokogiri"
+gem "httparty"
+gem "ntp"
+gem "trollop"
+gem "exceptional"
+gem "rack"
+gem "activesupport"
+
+gem "json-jruby"
+gem "jruby-openssl", '0.7.1'
+gem "aws-s3"

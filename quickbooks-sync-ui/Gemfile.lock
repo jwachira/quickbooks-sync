@@ -1,0 +1,51 @@
+GEM
+  remote: http://rubygems.org/
+  specs:
+    activesupport (3.0.1)
+    aws-s3 (0.6.2)
+      builder
+      mime-types
+      xml-simple
+    bouncy-castle-java (1.5.0145.2)
+    builder (2.1.2)
+    crack (0.1.8)
+    exceptional (2.0.26)
+    hoe (2.6.2)
+      rake (>= 0.8.7)
+      rubyforge (>= 2.0.4)
+    httparty (0.6.1)
+      crack (= 0.1.8)
+    jruby-openssl (0.7.1)
+      bouncy-castle-java
+    json (1.4.6-java)
+    json-jruby (1.4.6-java)
+      json (= 1.4.6)
+    json_pure (1.4.6)
+    mime-types (1.16)
+    nokogiri (1.4.3.1-java)
+      weakling (>= 0.0.3)
+    ntp (1.0.0)
+      hoe (>= 1.2.0)
+    rack (1.2.1)
+    rake (0.8.7)
+    rubyforge (2.0.4)
+      json_pure (>= 1.1.7)
+    trollop (1.16.2)
+    weakling (0.0.4-java)
+    xml-simple (1.0.12)
+
+PLATFORMS
+  java
+
+DEPENDENCIES
+  activesupport
+  aws-s3
+  builder
+  exceptional
+  httparty
+  jruby-openssl (= 0.7.1)
+  json-jruby
+  nokogiri
+  ntp
+  rack
+  trollop

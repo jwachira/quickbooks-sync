@@ -1,0 +1,309 @@
+JRUBY = RUBY_PLATFORM == "java"
+
+raise "JRuby required" unless JRUBY
+require 'set'
+
+ROOT = File.expand_path(File.dirname(__FILE__))
+PACKAGE_DIR = "#{ROOT}/package"
+CORE_DIR = "#{ROOT}/../quickbooks-sync-core/lib"
+CONNECTION_DIR = "#{ROOT}/../quickbooks-sync-connection/lib"
+SRC_DIRS = ["#{ROOT}/lib", CORE_DIR, CONNECTION_DIR]
+CLASS_DIR = "#{PACKAGE_DIR}/classes"
+BIN_DIR = "#{ROOT}/bin"
+
+BUNDLED_GEM_FILE = "#{PACKAGE_DIR}/bundled_gems.rb"
+
+OUTPUT_JAR = "#{PACKAGE_DIR}/package.jar"
+JAR_START_FILE = "#{PACKAGE_DIR}/jar_start.rb"
+JAR_START_TEMPLATE = "#{ROOT}/support/jar_start.rb.erb"
+
+require 'rubygems'
+
+Dir['tasks/**/*.rake'].each { |t| load t }
+
+require 'java'
+require File.dirname(__FILE__) + '/support/commons-io-1.4.jar'
+require 'erb'
+require 'tempfile'
+
+JRUBY_VERSION="1.5.2"
+JRUBY_COMPLETE_URL = "http://repository.codehaus.org/org/jruby/jruby-complete/#{JRUBY_VERSION}/jruby-complete-#{JRUBY_VERSION}.jar"
+JRUBY_COMPLETE_JAR = "#{PACKAGE_DIR}/jruby-complete-#{JRUBY_VERSION}.jar"
+
+
+task :jruby_complete => :package_dir do
+  unless File.exist? JRUBY_COMPLETE_JAR
+    system "curl #{JRUBY_COMPLETE_URL} > #{JRUBY_COMPLETE_JAR}"
+  end
+end
+
+task :package_dir do
+  FileUtils.mkdir_p PACKAGE_DIR
+end
+
+def gem_files
+  Bundler.environment.specs.map do |spec|
+    path = spec.full_gem_path
+
+    spec.files.
+      map {|file| File.join(path, file) }.
+      select {|file| File.exist?(file) and File.file?(file) }.
+      map {|file| [file, File.join(path, "..")] }
+  end.flatten(1)
+end
+
+def gem_files_without_jars
+  gem_files.reject {|file, path| jar?(file) }
+end
+
+def relative(file, dir)
+  Pathname.new(file).relative_path_from(Pathname.new(dir)).to_s
+end
+
+def gem_load_paths
+  Bundler.environment.specs.map do |spec|
+    relative_to = File.expand_path(File.join(spec.full_gem_path, ".."))
+    spec.require_paths.map {|path| File.join(spec.full_gem_path, path)}.map {|path| relative(path, relative_to)}
+  end.flatten
+end
+
+def files_for_jar
+  [[BUNDLED_GEM_FILE, PACKAGE_DIR]] +
+  gem_files_without_jars +
+  src_files_without_jars +
+  [jar_start_file] +
+  files_in(CLASS_DIR)
+end
+
+def jar_start_file
+  template = ERB.new(File.read(JAR_START_TEMPLATE))
+
+  file = File.open(JAR_START_FILE, "w")
+  file.puts template.result(binding)
+  file.close
+
+  [file.path, File.dirname(file.path)]
+end
+
+def src_files
+  SRC_DIRS.map do |src_dir|
+    files_in(src_dir)
+  end.flatten(1)
+end
+
+def src_files_without_jars
+  src_files.reject {|file, dir| jar?(file) }
+end
+
+def files_in(dir)
+  dir = File.expand_path(dir)
+  Dir["#{dir}/**/*"].map {|file| [file, dir]}.select {|file, dir| File.file?(file) }
+end
+
+def jar?(file)
+  File.extname(file) == ".jar"
+end
+
+def jar_files_embedded_in_gems
+  gem_files.select {|file, path| jar?(file) }.map {|file, path| file}
+end
+
+def jar_files_from_project
+  SRC_DIRS.map do |dir|
+    Dir["#{dir}/**/*.jar"]
+  end.flatten.reject {|jar| JAR_NAME_BLACKLIST.any? {|regexp| regexp =~ jar}}
+end
+
+def jar_files
+  [JRUBY_COMPLETE_JAR] + jar_files_embedded_in_gems + jar_files_from_project
+end
+
+def file_output_stream(path)
+  java.io.FileOutputStream.new(java.io.File.new(path))
+end
+
+def file_input_stream(path)
+  java.io.FileInputStream.new(java.io.File.new(path))
+end
+
+MAIN_CLASS = "com.turingstudio.qbsync.Main"
+
+MANIFEST = {
+  :MANIFEST_VERSION => "1.0",
+  :MAIN_CLASS => MAIN_CLASS
+}
+
+def manifest
+  manifest = java.util.jar.Manifest.new
+  MANIFEST.each do |key, val|
+    key = java.util.jar.Attributes::Name.const_get(key)
+    manifest.main_attributes.put key, val
+  end
+
+  manifest
+end
+
+JAR_NAME_BLACKLIST = [
+  /swt\_osx64\.jar/
+]
+
+JAR_BLACKLIST = [
+  /META-INF\/(.*)\.SF/,
+  /META-INF\/(.*)\.DSA/,
+  /META-INF\/(.*)\..RSA/,
+  /META-INF\/SIG-(.*)/
+]
+
+
+def dirs(files)
+  files.inject(Set.new) do |_, (file, root)|
+    path = File.dirname(relative(file, root))
+    parts = File.split(path).reject {|part| part == "."}
+
+    _ + (1..parts.length).map {|i| File.join(parts[0...i]) }
+  end
+end
+
+def config
+  @config ||= YAML.load_file(File.join(File.dirname(__FILE__), 'config.yml'))
+end
+
+def environments
+  config['environments']
+end
+
+task :environment do
+  @environment = ENV['QB_ENV'] || "staging"
+
+  environment_config = config['environments'][@environment]
+
+  raise "allowed environments: #{environments.keys.inspect}" unless environments.include? @environment
+
+  @remote_url = environment_config['url']
+  @run_automatically_at = environment_config['run_automatically_at']
+  @qb_sync_version = config['version']
+end
+
+desc "Bundle .jar file of the QuickBooks sync desktop client"
+task :jar => [:jruby_complete, :bundle_gems, :compile_java, :environment] do
+  output_stream = file_output_stream(OUTPUT_JAR)
+  jar_output_stream = java.util.jar.JarOutputStream.new(output_stream, manifest)
+
+  files = files_for_jar
+
+  dirs(files).each do |dir|
+    entry = java.util.zip.ZipEntry.new(dir + "/")
+    jar_output_stream.put_next_entry(entry)
+  end
+
+  files.each do |file, root|
+    entry = java.util.zip.ZipEntry.new(relative(file, root))
+    jar_output_stream.put_next_entry(entry)
+
+    input_stream = file_input_stream(file)
+    org.apache.commons.io.IOUtils.copy(input_stream, jar_output_stream)
+    input_stream.close
+
+    jar_output_stream.close_entry
+  end
+
+
+  jar_files.each do |jar|
+    jar_input_stream = java.util.jar.JarInputStream.new(file_input_stream(jar))
+    while (entry = jar_input_stream.get_next_entry)
+
+      next if JAR_BLACKLIST.any? {|regexp| regexp =~ entry.name }
+
+      begin
+        jar_output_stream.put_next_entry(entry)
+        unless entry.directory?
+          org.apache.commons.io.IOUtils.copy jar_input_stream, jar_output_stream
+        end
+
+        jar_output_stream.close_entry
+      rescue java.util.zip.ZipException => e
+        STDERR.puts "notice: duplicate entry for #{entry.name}"
+      end
+
+    end
+  end
+
+  jar_output_stream.close
+  output_stream.close
+end
+
+
+LAUNCH4J_ROOT = "#{ROOT}/support/launch4j"
+LAUNCH4J_BIN = "#{LAUNCH4J_ROOT}/launch4j"
+LAUNCH4J_CONFIG_TEMPLATE = "#{ROOT}/support/launch4jconfig.xml.erb"
+
+
+def resource(name)
+  ERB::Util.h(File.expand_path(File.join(ROOT, name)))
+end
+
+LAUNCH4J_CONFIG_PATH = "#{PACKAGE_DIR}/launch4jconfig.xml"
+desc "Compile and bundle .exe for deployment"
+task :exe => [:jar, :environment] do
+  @exe_file_name = "qb-sync-#{@environment}.exe"
+
+  ["splash.bmp", "icon.ico"].each do |f|
+    FileUtils.cp "#{ROOT}/support/#{f}", PACKAGE_DIR
+  end
+
+  template = ERB.new(File.read(LAUNCH4J_CONFIG_TEMPLATE))
+
+  File.open(LAUNCH4J_CONFIG_PATH, "w") do |f|
+    f.puts template.result(binding)
+  end
+
+  system "#{LAUNCH4J_BIN} #{LAUNCH4J_CONFIG_PATH}"
+end
+
+DIST_DIR = "#{ROOT}/dist"
+
+S3_CONFIG_FILE = File.dirname(__FILE__) + "/config/s3.yml"
+desc "Distribute .exe to S3 bucket"
+task :dist => :exe do
+  require 'aws/s3'
+  require 'yaml'
+  config = YAML.load(File.read(S3_CONFIG_FILE))['deploy']
+  AWS::S3::Base.establish_connection!(
+    :access_key_id => config['access_key_id'],
+    :secret_access_key => config['secret_access_key']
+  )
+
+  exe = File.open(File.join(PACKAGE_DIR, @exe_file_name))
+
+  AWS::S3::S3Object.store @exe_file_name, exe, config['bucket']
+
+  signed_url = AWS::S3::S3Object.url_for @exe_file_name, config['bucket'], :expires_in => 60 * 60 * 24
+
+  puts "Download url:"
+  puts signed_url
+end
+
+task :bundle_gems do
+  require "bundler"
+  Bundler.setup
+  File.open(BUNDLED_GEM_FILE, "w") do |f|
+    f.puts "GEMS_LOADED = true"
+    gem_load_paths.each do |path|
+      f.puts "$: << File.expand_path(File.dirname(__FILE__) + #{("/" + path).inspect})"
+    end
+  end
+
+end
+
+task :clean do
+  [PACKAGE_DIR, DIST_DIR].each do |dir|
+    system "rm -rf #{dir}"
+  end
+
+end
+
+task :compile_java => :jruby_complete do
+  FileUtils.mkdir_p CLASS_DIR
+  source_files = Dir["#{ROOT}/src/**/*.java"]
+  system "javac -classpath #{JRUBY_COMPLETE_JAR} -d #{CLASS_DIR} #{source_files}"
+end

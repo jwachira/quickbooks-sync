@@ -1,0 +1,13 @@
+To run UI:
+
+* Install JRuby 1.5.1 (http://jruby.org/download) on Windows
+* Start windows command prompt (cmd.exe)
+* `jruby -S bundle install`
+* `jruby bin\ui.rb`
+
+To package for distribution:
+
+* On OS X/Linux, install JRuby 1.5.1 via RVM
+* `bundle install`
+* `rake exe --trace`
+* Program is @ package/qb-sync.exe

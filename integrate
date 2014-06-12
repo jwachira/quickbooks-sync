@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+cd quickbooks-sync-core && bundle install && rake && cd ../acts_as_quick_books_resource && rake

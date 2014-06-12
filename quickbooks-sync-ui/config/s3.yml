@@ -1,0 +1,6 @@
+deploy:
+  access_key_id: AKIAIMQP2H67TNL3T5XA
+  secret_access_key: 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
+  bucket: qb-cruft
+
+

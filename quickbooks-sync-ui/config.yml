@@ -1,0 +1,10 @@
+environments:
+  production:
+    url: "https://sunnyvale.itu.edu:344"
+  staging:
+    url: "https://staging.sunnyvale.itu.edu"
+   # run_automatically_at: '10:00 PM'
+  staging-qb:
+    url: "https://staging-qb.turingstudio.com/"
+version: '9'
+

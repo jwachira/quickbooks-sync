@@ -1,0 +1,2 @@
+export GEM_PATH=c:\ruby\lib\ruby\gems\1.8
+@"C:\ironruby\bin\ir.exe" "c:\ruby\bin\cucumber" %*

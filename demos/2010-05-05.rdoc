@@ -1,0 +1,74 @@
+== Setup 
+
+* Remove all contents from the 'sync.json' file.
+
+* Open a company file in QuickBooks.
+
+* At the Windows command line, run the following command within the root directory:
+
+  ir quickbooks-sync-ui\bin\ui.rb
+
+* At your Unix command line, run the following command within the root directory:
+
+  ruby extras/json-editor/app.rb
+
+* Point your web browser to 'http://localhost:4567'.
+
+== Initial Sync
+
+* Press the 'Sync Now' button on the Sync UI.
+
+* Refresh your web browser. Note that the Customer resources are the same in the web display as in QuickBooks.
+
+== Synchronizing a new Customer record
+
+* Add a Customer record to QuickBooks with the name "John Doe".
+
+* Press the 'Sync Now' button on the Sync UI.
+
+* Refresh your web browser. Note that the new Customer resource appears in the web display.
+
+== Synchronizing a non-conflicting field change
+
+* Change the name field on "John Doe" to "John Smith" on the web display, and press 'Save'.
+
+* Press the 'Sync Now' button on the Sync UI. Note that the QuickBooks record updates to read "John Smith"
+
+== Synchronizing a conflicting field change
+
+* Change the name field on "John Smith" to "John Deere" on the web display, and press 'Save'.
+
+* Change the name field on "John Smith" to "John Cash" on QuickBooks.
+
+* Press the 'Sync Now' button on the Sync UI. There should be 1 conflict.
+
+* Select "John Cash" from the conflict UI and press the 'Sync Now' button again.
+
+* Note that both the QuickBooks record and the web display read "John Cash".
+
+== Synchronizing multiple conflicting field changes
+
+* Add a new Customer record to QuickBooks with the name "Alec Baldwin".
+
+* Press the 'Sync Now' button on the Sync UI.
+
+* Change the "John Cash" value to "Johnny 1" on the web display and press 'Save'.
+
+* Change the "Alec Baldwin" value to "Daniel Baldwin" on the web display and press 'Save'.
+
+* Change the "John Cash" value to "Johnny 2" on QuickBooks.
+
+* Change the "Alec Baldwin" value to "Stephen Baldwin" on QuickBooks.
+
+* Press the 'Sync Now' button on the Sync UI. There should be 2 conflicts.
+
+* Select "Johnny 1" and "Stephen Baldwin" from the conflict UI and press the 'Sync Now' button again.
+
+* Note that both the QuickBooks record and the web display read "Johnny 1" and "Stephen Baldwin" respectively.
+
+== Field length validation
+
+* Enter a name longer than 41 characters for "John Cash" into the web display.
+
+* Press 'Save' for the corresponding record on the web display. Note that a validation error appears next to the field.
+

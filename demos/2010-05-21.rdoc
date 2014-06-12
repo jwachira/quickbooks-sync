@@ -1,0 +1,85 @@
+== Purpose
+
+* invoice CRUD inside of customers
+* invoice synchronization
+* uniquness validation on customer names to prevent duplicate records
+* conflict resolution on ITU
+
+== Setup
+
+* Delete all customers and invoices from the ITU application.
+
+* Open a company file in QuickBooks.
+
+* At the Windows command line, run the following command within the root directory:
+
+  ir quickbooks-sync-ui\bin\ui.rb --remote=http://itu-admissions.turingstudio.com
+
+* Point your web browser to 'http://itu-admissions.turingstudio.com/customers'.
+
+* Press the 'Sync Now' button on the Sync UI.
+
+== Creating an invoice on the ITU application and synchronizing to QuickBooks ({#1485}[https://turing.sifterapp.com/projects/6343/issues/1485/comments])
+
+* Click a customer's name on the ITU application.
+
+* Click 'New Invoice'
+
+* Enter a line item for the invoice
+
+* Click 'Create Invoice'
+
+* Press the 'Sync Now' button on the Sync UI.
+
+* Note that an invoice record has been created for the customer in QuickBooks.
+
+== Creating an invoice on QuickBooks and synchronizing to ITU ({#1485}[https://turing.sifterapp.com/projects/6343/issues/1485/comments])
+
+* Create a new invoice for any customer in QuickBooks with a single line item.
+
+* Press the 'Sync Now' button on the Sync UI.
+
+* Click on the corresponding customer's name in the ITU application.
+
+* Note that the customer now has a matching invoice record.
+
+== Creating a customer record with a non-unique name on ITU ({#1482}[https://turing.sifterapp.com/projects/6343/issues/1482/comments])
+
+* Create a customer named "Already Taken" on QuickBooks.
+
+* Press the 'Sync Now' button on the Sync UI.
+
+* Attempt to create a customer named "Already Taken" on the ITU application.
+
+* Note that the form does not allow submitting the customer record.
+
+== Deleting a record on ITU and synchronizing the deletion to QuickBooks ({#1491}[https://turing.sifterapp.com/projects/6343/issues/1491/comments])
+
+* Press the 'Sync Now' button on the Sync UI to ensure all changes are synchronized.
+
+* In the ITU application, click 'Destroy' next to any of the customer records.
+
+* Press the 'Sync Now' button on the Sync UI again.
+
+* Note that the record you deleted from ITU is no longer present in QuickBooks.
+
+* Refresh the customer index on ITU.
+
+* Note that the customer record is no longer shown.
+
+== Conflict resolution on ITU application
+
+* Change the phone number of "Already Taken" to 123-456-7890 from QuickBooks.
+
+* Change the phone number of "Already Taken" to 867-5309 from the ITU application.
+
+* Press the 'Sync Now' button on the Sync UI.
+
+* Note that the UI presents a conflict resolution form. 
+
+* Select the record with the phone number "867-5309".
+
+* Press the 'Sync Now' button again.
+
+* Note that the phone number for "Already Taken" reads 867-5309 on both the ITU application and QuickBooks.
+

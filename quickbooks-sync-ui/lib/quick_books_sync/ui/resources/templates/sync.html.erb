@@ -1,0 +1,42 @@
+<%= erb("head.html.erb") %>
+<div class="box">
+<button class="sync">Sync</button>
+
+<div class="conflicto">
+  <% conflicts.each do |conflict| %>
+    <table class="conflicts" data-id="<%= h conflict.unique_id %>" data-type="<%= h conflict.type %>">
+      <tr><th colspan="3"><%= h conflict.type %> Conflict Detected</th></tr>
+      <tr><th>name</th><th>remote</th><th>quickbooks</th></tr>
+      <% conflict.differences.each do |name, (remote, quickbooks)| %>
+        <tr class="quickbooks-selected field" data-name="<%= h name %>">
+          <td><%= h name.to_s.split('_').map {|w| w.capitalize }.join(' ') %></td>
+          <td class="remote"><%= h remote %></td>
+          <td class="quickbooks"><%= h quickbooks %></td>
+        </tr>
+      <% end %>
+    </table>
+  <% end %>
+  <% local_errors.each do |error| %>
+    <table class="errors">
+      <tr><th>QuickBooks Errors</th></tr>
+      <tr>
+        <td><%=error.message %></td>
+      </tr>
+    </table>
+  <% end %>
+  <% remote_errors.each do |error| %>
+    <table class="errors">
+      <tr><th colspan="3">EMS Errors</th></tr>
+      <tr>
+        <td><%= error.resource.type %></td>
+        <td><%= error.resource.attributes.inspect %></td>
+        <td><%=h error.message %></td>
+      </tr>
+    </table>
+  <% end %>
+</div>
+
+<div id="status"><%= h(status) if status %></div>
+</div>
+<%= erb("foot.html.erb")%>
+

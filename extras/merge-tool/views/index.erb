@@ -1,0 +1,33 @@
+<html>
+
+  <head>
+    <script language="javascript" type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+    <script language="javascript" type="text/javascript" src="/javascripts/jquery.mergify.js"></script>
+    <script type="text/javascript">
+      $(function() {
+          $('#mergify').mergify(
+            [
+            [ { 'name': 'Alec Baldwin',     'age': 26, 'gender': 'male' }, { 'name': 'Alec Baldwin', 'age':26, 'gender':'female' } ],
+            [ { 'name': 'Stephen Baldwin',  'age': 31, 'gender': 'male' }, { 'name': 'Alec Baldwin', 'age':26, 'gender':'female' } ],
+            [ { 'name': 'James Baldwin',    'age': 45, 'gender': 'male' }, { 'name': 'Alec Baldwin', 'age':26, 'gender':'female' } ],
+            [ { 'name': 'Joseph Baldwin',   'age': 62, 'gender': 'male' }, { 'name': 'Alec Baldwin', 'age':26, 'gender':'female' } ]
+            ]);
+          });
+    </script>
+    <link rel="stylesheet" type="text/css" href="/stylesheets/mergify.css"/>
+    <style>
+      #container { 
+        width: 600px;
+        margin: 0 auto;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="container">
+      <div id="mergify">
+      </div>
+    </div>
+  </body>
+
+</html>

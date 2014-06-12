@@ -1,0 +1,18 @@
+source :gemcutter
+
+gem "builder"
+gem "nokogiri"
+gem "cucumber", "0.8.5"
+gem "rspec"
+gem "awesome_print"
+gem "rest-client"
+gem "sinatra"
+gem "ntp"
+gem "trollop"
+gem "activesupport"
+gem "activerecord"
+gem "rack-test"
+
+gem "json-jruby"
+gem "jruby-openssl"
+gem "activerecord-jdbcsqlite3-adapter"

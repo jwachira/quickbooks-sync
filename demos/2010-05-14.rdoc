@@ -1,0 +1,61 @@
+== Purpose
+
+This script demonstrates end-to-end integration of the QuickBooks sync tool into a Rails application using 
+ActiveRecord models. It also demostrates our integrated ActiveRecord validation based upon the QuickBooks schema
+to automatically prevent users from submitting invalid data to the database.
+
+== Setup
+
+* Delete all customers from the ITU application.
+
+* Open a company file in QuickBooks.
+
+* At the Windows command line, run the following command within the root directory:
+
+  ir quickbooks-sync-ui\bin\ui.rb --remote=http://itu-admissions.turingstudio.com
+
+* Point your web browser to 'http://itu-admissions.turingstudio.com/customers'.
+
+== Initial Sync
+
+* Press the 'Sync Now' button on the Sync UI.
+
+* Refresh your web browser. Note that the Customer resources are the same in the web display as in QuickBooks.
+
+== Synchronizing a new Customer record created in QuickBooks
+
+* Add a Customer record to QuickBooks with the name "George Lucas".
+
+* Press the 'Sync Now' button on the Sync UI.
+
+* Refresh your web browser. Note that the new Customer resource appears in the web display.
+
+== Synchronizing a new Customer record created on the ITU application
+
+* Add a Customer record to the ITU application with the name "Steven Spielberg".
+
+* Press the 'Sync Now' button on the Sync UI.
+
+* Note that the new customer record appears in QuickBooks.
+
+== Editing a field in the Rails application
+
+* Change George Lucas's phone number to 1-800-1234567 from the ITU application.
+
+* Press the 'Sync Now' button on the Sync UI.
+
+* Note that the phone number has changed on the QuickBooks record.
+
+== Editing a field in QuickBooks
+
+* Change Steven Spielberg's phone number to 555-1234 in QuickBooks.
+
+* Press the 'Sync Now' button on the Sync UI.
+
+* Note that the phone number has changed in the ITU application.
+
+== Rails on-save field length validation
+
+* Enter a name longer than 41 characters for George Lucas into the ITU application.
+
+* Attempt to update the record. Note that the application shows an error informing you that you cannot proceed.

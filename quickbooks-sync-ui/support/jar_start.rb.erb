@@ -1,0 +1,8 @@
+require 'load_from_jar'
+
+QuickBooksSync::UI.start(
+  :remote => <%= @remote_url.inspect %>,
+  :version => <%= @qb_sync_version.inspect %>,
+  :run_automatically_at => <%= @run_automatically_at.inspect %>
+)
+

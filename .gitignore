@@ -1,0 +1,9 @@
+.DS_Store
+quickbooks-sync-core/vendor
+quickbooks-sync-core/.bundle
+quickbooks-sync-core/jruby-gems/.bundle
+*.json
+*.log
+extras/json-editor/*.log
+**/*.sqlite3
+

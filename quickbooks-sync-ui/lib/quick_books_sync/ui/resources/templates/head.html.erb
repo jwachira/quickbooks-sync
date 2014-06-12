@@ -1,0 +1,46 @@
+<html>
+
+  <head>
+    <%= script "jquery-1.4.2.min.js" %>
+    <%= script "jquery.form.js" %>
+    <%= script "json2.js" %>
+    <%= script "jquery.mergify.js" %>
+    <%= script "sync.js" %>
+
+    <link rel="stylesheet" type="text/css" href="<%= url "stylesheets/mergify.css" %>"/>
+    <style>
+      body {
+        overflow:hidden;
+        background: url(<%= resource("images/back.jpg") %>);
+      }
+
+      #container { 
+        width: 600px;
+        margin: 0 auto;
+        position:relative;
+      }
+      
+      .box,
+      .sync-box {position: absolute;top:170px;left:70px;width:445px;height:120px;}
+      button {position:absolute;top:20px;left:20px;}
+      #status {position:absolute;right:20px;top:20px;padding: 5px 8px;background:#DDD;font-family:arial;color:#333;font-weight:bold;border:1px solid #aaa;font-size:14px;}
+      
+      .sync-message {position:absolute;left:70px;top:60px;width:160px;height:40px;background: url(<%= resource("images/syncing.png") %>);}
+      .spinner {position:absolute;left:250px;top:55px;}
+      
+      .quickbooks-selected .quickbooks {
+        background-color: green;
+      }
+
+      .remote-selected .remote {
+        background-color: green;
+      }
+      
+      .conflicto {position:absolute;top:53px;left:20px;}
+      .conflicto table {background-color: #fff; font-size:11px;font-family:arial;width:300px;border:1px solid #aaa;}
+
+    </style>
+  </head>
+
+  <body>
+    <div id="container">

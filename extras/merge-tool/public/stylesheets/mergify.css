@@ -1,0 +1,32 @@
+.mergify {
+  font-family: Helvetica, Verdana, Sans-serif;
+  border: 1px solid #ccc;
+}
+
+.mergify > table {
+  width: 100%;
+}
+
+.mergify > table table {
+  font-size: 12px;
+}
+
+.mergify > table table td.label {
+  font-weight: bold;
+}
+
+.mergify > table td {
+  cursor: pointer;
+}
+
+.mergify > table td.selected {
+  background-color: rgb(170, 255, 170);
+}
+.mergify > table td.rejected {
+  background-color: rgb(255, 170, 170);
+}
+
+.mergify > table > tr {
+  background-color: rgb(221, 221, 221);
+}
+

@@ -1,0 +1,19 @@
+source :gemcutter
+
+gem "builder"
+gem "nokogiri"
+gem "cucumber"
+gem "rspec"
+gem "awesome_print"
+gem "httparty"
+gem "sinatra"
+gem "ntp"
+gem "trollop"
+gem "activesupport"
+gem "activerecord", "2.3.8"
+gem "rack-test"
+gem "ruby-cache"
+
+gem "json"
+gem "sqlite3-ruby", '1.3.1'
+

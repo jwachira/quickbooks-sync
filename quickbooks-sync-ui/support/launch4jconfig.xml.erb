@@ -1,0 +1,33 @@
+<launch4jConfig>
+  <headerType>gui</headerType>
+  <outfile><%= @exe_file_name %></outfile>
+  <jar>package.jar</jar>
+  <errTitle>QuickBooks Sync</errTitle>
+  <chdir>.</chdir>
+  <dontWrapJar>false</dontWrapJar>
+
+  <customProcName>true</customProcName>
+  <icon>icon.ico</icon>
+  <classPath>
+    <mainClass><%= MAIN_CLASS %></mainClass>
+    <cp>.</cp>
+  </classPath>
+
+  <stayAlive>true</stayAlive>
+
+  <singleInstance>
+    <mutexName>qb-sync</mutexName>
+  </singleInstance>
+
+  <jre>
+    <minVersion>1.6.0</minVersion>
+  </jre>
+
+  <splash>
+    <file>splash.bmp</file>
+    <waitForWindow>true</waitForWindow>
+    <timeout>240</timeout>
+    <timeoutErr>true</timeoutErr>
+  </splash>
+</launch4jConfig>
+

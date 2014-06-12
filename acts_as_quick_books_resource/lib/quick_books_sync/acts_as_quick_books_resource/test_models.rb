@@ -1,0 +1,7 @@
+require 'quick_books_sync/acts_as_quick_books_resource/test_models/customer'
+require 'quick_books_sync/acts_as_quick_books_resource/test_models/invoice'
+require 'quick_books_sync/acts_as_quick_books_resource/test_models/invoice_line'
+require 'quick_books_sync/acts_as_quick_books_resource/test_models/item'
+require 'quick_books_sync/acts_as_quick_books_resource/test_models/payment_method'
+require 'quick_books_sync/acts_as_quick_books_resource/test_models/receive_payment'
+require 'quick_books_sync/acts_as_quick_books_resource/test_models/applied_to_txn'
