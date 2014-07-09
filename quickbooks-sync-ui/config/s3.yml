@@ -1,4 +1,4 @@
 deploy:
   access_key_id: 'fake'
   secret_access_key: 'fake'
-  bucket: qb-cruft
+  bucket: whatever
